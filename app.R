@@ -20,7 +20,7 @@ lista_empresas <- c("NUEVAPOLAR", "SMU", "BESALCO", "COPEC", "FALABELLA",
                     "BANMEDICA", "EMBONOR-B", "FORUS",  "IAM", "MASISA", "ORO BLANCO", 
                     "SK", "SMSAAM")
 
-#Función para obtener indicadores desde elmercudio.com
+#Function to get indicators from elmercurio.com
 obtener_indicadores <- function(empresa = "FALABELLA") { 
     
     url <- stringr::str_c("https://www.elmercurio.com/inversiones/json/json.aspx?categoria=", 
@@ -40,26 +40,26 @@ obtener_indicadores <- function(empresa = "FALABELLA") {
     df 
 } 
 
-minmax <- function(negocio){
-    d <- obtener_indicadores(negocio) 
-    salida <- ""
-    salida$yearmin <- year(min(d$fecha))
-    salida$yearmax <- year(max(d$fecha))
-    salida
+minmax <- function(company){
+    d <- obtener_indicadores(company) 
+    output <- ""
+    output$yearmin <- year(min(d$fecha))
+    output$yearmax <- year(max(d$fecha))
+    output
     
 } 
 
 
-ui <- navbarPage("Análisis de precio por empresa",
+ui <- navbarPage("Stock Price Analysis by Company",
                  theme=shinytheme("spacelab"),
-                 tabPanel("Inicio",
+                 tabPanel("Home",
                           
                           sidebarLayout(
                               sidebarPanel(
-                                  selectInput("empresa", "Seleccionar una empresa:", 
+                                  selectInput("empresa", "Select a company:", 
                                               choices = lista_empresas, selected = "NUEVAPOLAR"), 
                                   minimo <- textOutput("min"),
-                                  sliderInput("year", "Precio por período:", min = 2012, max = 2021, value = c(1,1)),
+                                  sliderInput("year", "Price by period:", min = 2012, max = 2021, value = c(1,1)),
                                   mainPanel(tableOutput("tableSummary"))
                                   
                               ),
@@ -94,21 +94,21 @@ server <- function(input, output, session) {
             d <- d %>%
                 filter(year(fecha) >= inputyear[1], year(fecha) <= inputyear[2]) 
         }
-        #Busco los valores de precio iniciales y finales de acuerdo al filtro
+        #Find initial and final price values according to the filter
         first_val <- d$precio[1]
         last_val <- tail(d$precio, n = 1)
         
-        #se define el color rojo cuando hay pérdida y verde cuando hay ganancia
+        #Red color is defined when there is a loss and green when there is a gain
         state_colour <- ifelse(last_val > first_val, "green", "red")
-        #Plot de evolución durante rango de tiempo
+        #Plot of evolution over time range
         ggplot(data = d, aes(x = fecha, y = precio, group = 1)) +
             geom_line(color = state_colour, linetype = "solid", size=1)+ 
             #geom_point()+
             theme(axis.text.x = element_text(angle = 45, vjust = 0.5), 
                   panel.background=element_rect(fill="white"))+
-            labs(title = paste0("Evolucion de precio para ",empresa),
-                 x = "Fecha",
-                 y = "Precio")
+            labs(title = paste0("Price evolution for ",empresa),
+                 x = "Date",
+                 y = "Price")
         
     })
     
@@ -127,14 +127,14 @@ server <- function(input, output, session) {
         d<-d %>%
             group_by(anio) %>% 
             summarise(mean(precio)) 
-        print(paste0("Tabla valor"))
+        print(paste0("Value table"))
         print(d)
     })
     
     observe({
-        otro <- minmax(input$empresa)
-        aux <- otro$yearmin
-        auxMax <- otro$yearmax
+        result <- minmax(input$empresa)
+        aux <- result$yearmin
+        auxMax <- result$yearmax
         
         updateSliderInput(session, 'year',min = as.numeric(aux), 
                           max = as.numeric(auxMax), step = 1, value = c(as.numeric(aux),as.numeric(auxMax)))
