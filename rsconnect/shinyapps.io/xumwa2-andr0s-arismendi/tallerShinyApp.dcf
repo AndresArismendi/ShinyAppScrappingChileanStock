@@ -1,0 +1,13 @@
+name: tallerShinyApp
+title: tallerShinyApp
+username:
+account: xumwa2-andr0s-arismendi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5271660
+bundleId: 5330734
+url: https://xumwa2-andr0s-arismendi.shinyapps.io/tallerShinyApp/
+when: 1638737952.64106
+lastSyncTime: 1638737952.64106
+asMultiple: FALSE
+asStatic: FALSE
